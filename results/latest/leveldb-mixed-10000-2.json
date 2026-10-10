@@ -1,0 +1,43 @@
+{
+  "engine": "leveldb",
+  "profile": "mixed",
+  "rows": 10000,
+  "inputBytes": 13631679,
+  "expectedHash": "8f1b6eef7c8b18c7cee7c47a9a4e34d787c8581adea12378c8e916d4b012eb07",
+  "timings": {
+    "insertMs": 34.573499999999996,
+    "maintenanceMs": 12.732916999999986,
+    "readAllMs": 18.138374999999996,
+    "warmReadAllMs": 16.584790999999996,
+    "projectionMs": 18.422374999999988,
+    "point20Ms": 1.0895829999999762,
+    "update5Ms": 0.4732919999999865,
+    "delete5Ms": 0.29583399999998505
+  },
+  "empty": {
+    "logical": 474,
+    "allocated": 12288,
+    "files": 5
+  },
+  "afterInsert": {
+    "logical": 14586353,
+    "allocated": 14610432,
+    "files": 10
+  },
+  "stored": {
+    "logical": 13951845,
+    "allocated": 13971456,
+    "files": 10
+  },
+  "incremental": {
+    "logical": 13951371,
+    "allocated": 13959168
+  },
+  "afterChurn": {
+    "logical": 13946964,
+    "allocated": 13979648,
+    "files": 13
+  },
+  "verified": true,
+  "maxRssBytes": 276004864
+}

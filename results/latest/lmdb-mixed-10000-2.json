@@ -1,0 +1,43 @@
+{
+  "engine": "lmdb",
+  "profile": "mixed",
+  "rows": 10000,
+  "inputBytes": 13631679,
+  "expectedHash": "8f1b6eef7c8b18c7cee7c47a9a4e34d787c8581adea12378c8e916d4b012eb07",
+  "timings": {
+    "insertMs": 44.1335,
+    "maintenanceMs": 0.018165999999979476,
+    "readAllMs": 13.576208000000008,
+    "warmReadAllMs": 10.318250000000006,
+    "projectionMs": 10.221249999999998,
+    "point20Ms": 0.3100420000000099,
+    "update5Ms": 19.804249999999996,
+    "delete5Ms": 17.89891700000001
+  },
+  "empty": {
+    "logical": 40968,
+    "allocated": 45056,
+    "files": 2
+  },
+  "afterInsert": {
+    "logical": 15065096,
+    "allocated": 15069184,
+    "files": 2
+  },
+  "stored": {
+    "logical": 15065096,
+    "allocated": 15069184,
+    "files": 2
+  },
+  "incremental": {
+    "logical": 15024128,
+    "allocated": 15024128
+  },
+  "afterChurn": {
+    "logical": 15065096,
+    "allocated": 15069184,
+    "files": 2
+  },
+  "verified": true,
+  "maxRssBytes": 271417344
+}

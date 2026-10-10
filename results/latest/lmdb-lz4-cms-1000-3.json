@@ -1,0 +1,43 @@
+{
+  "engine": "lmdb-lz4",
+  "profile": "cms",
+  "rows": 1000,
+  "inputBytes": 1359066,
+  "expectedHash": "d0be7423871adf277513c7cfe8fac55f7ef294ab42d4de443daa75b68d1aa7ab",
+  "timings": {
+    "insertMs": 16.474417,
+    "maintenanceMs": 0.007958999999999605,
+    "readAllMs": 2.547542,
+    "warmReadAllMs": 1.2695829999999972,
+    "projectionMs": 1.203125,
+    "point20Ms": 0.2797920000000005,
+    "update5Ms": 19.894375000000004,
+    "delete5Ms": 19.1015
+  },
+  "empty": {
+    "logical": 40968,
+    "allocated": 45056,
+    "files": 2
+  },
+  "afterInsert": {
+    "logical": 253960,
+    "allocated": 258048,
+    "files": 2
+  },
+  "stored": {
+    "logical": 253960,
+    "allocated": 258048,
+    "files": 2
+  },
+  "incremental": {
+    "logical": 212992,
+    "allocated": 212992
+  },
+  "afterChurn": {
+    "logical": 368648,
+    "allocated": 372736,
+    "files": 2
+  },
+  "verified": true,
+  "maxRssBytes": 78774272
+}

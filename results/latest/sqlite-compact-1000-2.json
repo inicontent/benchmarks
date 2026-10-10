@@ -1,0 +1,43 @@
+{
+  "engine": "sqlite",
+  "profile": "compact",
+  "rows": 1000,
+  "inputBytes": 89066,
+  "expectedHash": "3ab711d4dfa67d6f05fed28b8adb3ee35f31985070a964bb61772448a094074c",
+  "timings": {
+    "insertMs": 0.6805830000000022,
+    "maintenanceMs": 0.5055420000000019,
+    "readAllMs": 0.33916599999999875,
+    "warmReadAllMs": 0.436084000000001,
+    "projectionMs": 0.17441700000000182,
+    "point20Ms": 0.22974999999999923,
+    "update5Ms": 0.26270900000000097,
+    "delete5Ms": 0.1524169999999998
+  },
+  "empty": {
+    "logical": 8192,
+    "allocated": 8192,
+    "files": 1
+  },
+  "afterInsert": {
+    "logical": 94552,
+    "allocated": 98304,
+    "files": 3
+  },
+  "stored": {
+    "logical": 53248,
+    "allocated": 53248,
+    "files": 1
+  },
+  "incremental": {
+    "logical": 45056,
+    "allocated": 45056
+  },
+  "afterChurn": {
+    "logical": 53248,
+    "allocated": 53248,
+    "files": 1
+  },
+  "verified": true,
+  "maxRssBytes": 56016896
+}
