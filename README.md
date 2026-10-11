@@ -29,6 +29,32 @@ Three independent repetitions across all ten configurations, using the same repe
 
 iniBase gzip used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**.
 
+### Read, insert, update, and delete performance
+
+At **100,000 CMS records**, medians of three trials. **All timings are total milliseconds; lower is better.** These are database API operations, not HTTP endpoint benchmarks.
+
+- **`post` / insert:** load all 100,000 records in batches of 1,000; includes commit/flush, excludes separately reported maintenance.
+- **`get` / read:** materialize all 100,000 records; projection reads only `seq` and `category`. Reads are affected by the OS cache.
+- **`put` / update:** five separate, committed updates to selected records, setting `score` to `-1`; includes locating each record.
+- **Delete:** five separate, committed record deletions; includes locating each record.
+
+| Configuration | `post`: insert 100k | `get`: read 100k | `get`: projection 100k | `put`: 5 updates | 5 deletes |
+|---|---:|---:|---:|---:|---:|
+| iniBase 3.7.0 plain | 6039.691 | 178.096 | 47.142 | 598.635 | 949.284 |
+| iniBase 3.7.0 gzip | 3223.035 | 211.138 | 44.270 | 4270.342 | 1655.426 |
+| SQLite | 299.916 | 90.997 | 38.191 | 0.695 | 0.282 |
+| DuckDB | 849.125 | 137.520 | 18.897 | 2.028 | 0.803 |
+| PGlite | 855.663 | 322.703 | 131.160 | 1.257 | 0.610 |
+| PostgreSQL | 467.132 | 76.522 | 17.601 | 1.055 | 0.457 |
+| MongoDB | 616.344 | 330.629 | 82.456 | 18.436 | 20.398 |
+| LevelDB | 281.120 | 186.870 | 166.188 | 0.682 | 0.260 |
+| LMDB | 544.114 | 138.888 | 86.385 | 18.286 | 19.139 |
+| LMDB LZ4 | 1391.573 | 139.965 | 111.669 | 19.158 | 20.010 |
+
+iniBase gzip uses less disk on this fixture, but its five updates take **4,270 ms**, compared with **599 ms** for iniBase plain. Its bulk insert also takes longer than every competitor here. Full-read and projection results vary by engine; the storage advantage is not a universal performance advantage.
+
+Every trial verifies full content, projections, lookups, updates, and remaining data after deletion. Durability and transaction semantics differ across engines; see the [methodology](METHODOLOGY.md) and [complete timing report, including maintenance](results/large-cms/REPORT.md).
+
 ### Application-key lookup performance
 
 Median total for 20 application-key lookups at 100,000 records, across three trials:
