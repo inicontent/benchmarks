@@ -2,7 +2,7 @@
 
 Reproducible storage and workload comparisons maintained by the iniBase team. The suite is designed to find and explain iniBase's strengths for CMS workloads, with every measured competitor, failure, and tradeoff retained.
 
-**[Read the measured report](results/latest/REPORT.md)** · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
+**[Read the measured report](results/latest/REPORT.md)** · **[100,000-record CMS report](results/large-cms/REPORT.md)** · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
 
 ## Storage highlights from this host
 
@@ -16,6 +16,24 @@ At **10,000 records**, medians of three trials on Apple M5:
 ![Storage across all three datasets, including competing winners](results/latest/storage.png)
 
 Total allocated footprint after maintenance and clean close; synthetic fixtures, no replicas/backups. The [report](results/latest/REPORT.md) also shows empty-baseline growth, every engine, timings, and failures. Native server totals include fixed cluster costs.
+
+## 100,000-record CMS scale run
+
+Three independent repetitions across all eleven configurations, using the same repetitive CMS fixture and 1,000-row insert batches:
+
+| Configuration | Median allocated disk |
+|---|---:|
+| iniBase gzip + **unreleased fix** | 1.637 MiB |
+| LevelDB | 15.387 MiB |
+| SQLite | 130.539 MiB |
+
+The experimental fix used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**. Published iniBase gzip failed verification in all three scale trials and is excluded from this comparison. The patched configuration's 20 application-key lookups took a median **87.9 seconds**, versus under a millisecond for SQLite/LevelDB; this is a material limitation of this query path.
+
+![100,000-record CMS storage comparison](results/large-cms/storage.png)
+
+See the [full scale report](results/large-cms/REPORT.md) for every engine, baseline growth, all timings, and failure logs in the linked raw data. This scale run is CMS-only; it does not establish the same advantage for high-entropy data.
+
+Across the main and scale matrices: **231 trials, 222 verified successes, nine published-gzip correctness failures**. No failed sample is counted as a storage win. The [regression test](tests/gzip-append.test.mjs) passes for the separate experimental fix.
 
 ## Engines
 
@@ -42,7 +60,7 @@ npm ci
 npm run smoke
 npm run bench
 # Larger storage comparison:
-npm run bench -- --rows=100000 --repeats=3 --output=results/large
+npm run bench -- --rows=100000 --profiles=cms --repeats=3 --output=results/large-cms
 # Select engines/profiles:
 npm run bench -- --engines=inibase,inibase-gzip,sqlite,duckdb --profiles=cms --rows=10000
 ```
@@ -64,7 +82,7 @@ Native libraries/server startup may require execution outside restrictive sandbo
 
 ## Known correctness failure and unreleased experiment
 
-Published iniBase 3.6.0 gzip fails full-content verification for 10,000-row CMS/mixed datasets on this host. Its shell-based append exceeds ARG_MAX and silently leaves part of a column unwritten. These failures are retained and excluded from rankings. `inibase-gzip-patched` is a separate, unreleased configuration with a small Node gzip/appendFile fix; see [patch details](patches/README.md). Run `npm test` for the focused regression test. The default benchmark exits nonzero while known baseline failures remain.
+Published iniBase 3.6.0 gzip fails full-content verification for 10,000-row CMS/mixed datasets and the 100,000-row CMS dataset on this host. Its shell-based append exceeds ARG_MAX and silently leaves part of a column unwritten. These failures are retained and excluded from rankings. `inibase-gzip-patched` is a separate, unreleased configuration with a small Node gzip/appendFile fix; see [patch details](patches/README.md). Run `npm test` for the focused regression test. The default benchmark exits nonzero while known baseline failures remain.
 
 ## Reading the results
 

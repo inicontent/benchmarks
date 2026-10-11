@@ -1,27 +1,27 @@
 {
-  "name": "@inicontent/benchmarks",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "bench": "node src/run.mjs",
-    "smoke": "node src/run.mjs --rows=100 --repeats=1 --output=results/smoke",
-    "report": "node src/report.mjs",
-    "test": "node --test tests/*.test.mjs",
-    "verify": "node src/verify-results.mjs"
-  },
-  "engines": {
-    "node": ">=22.13"
-  },
-  "dependencies": {
-    "@duckdb/node-api": "1.5.6-r.1",
-    "@electric-sql/pglite": "0.5.8",
-    "embedded-postgres": "18.4.0-beta.17",
-    "inibase": "3.6.0",
-    "level": "10.0.0",
-    "lmdb": "3.5.7",
-    "mongodb": "7.7.0",
-    "mongodb-memory-server": "11.3.0",
-    "pg": "8.23.1"
-  }
+	"name": "@inicontent/benchmarks",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"bench": "node src/run.mjs",
+		"smoke": "node src/run.mjs --rows=100 --repeats=1 --output=results/smoke",
+		"report": "node src/report.mjs",
+		"test": "node --test tests/*.test.mjs",
+		"verify": "node src/verify-results.mjs"
+	},
+	"engines": {
+		"node": ">=22.13"
+	},
+	"dependencies": {
+		"@duckdb/node-api": "1.5.6-r.1",
+		"@electric-sql/pglite": "0.5.8",
+		"embedded-postgres": "18.4.0-beta.17",
+		"inibase": "3.6.0",
+		"level": "10.0.0",
+		"lmdb": "3.5.7",
+		"mongodb": "7.7.0",
+		"mongodb-memory-server": "11.3.0",
+		"pg": "8.23.1"
+	}
 }

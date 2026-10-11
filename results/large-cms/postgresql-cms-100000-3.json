@@ -1,0 +1,44 @@
+{
+  "engine": "postgresql",
+  "profile": "cms",
+  "rows": 100000,
+  "inputBytes": 136505586,
+  "expectedHash": "8f946d74ca7ff4f6b841b7863c3834c7ec14b1084c5578bb037028bbcbf75196",
+  "timings": {
+    "insertMs": 497.12254099999996,
+    "maintenanceMs": 105.63175000000001,
+    "readAllMs": 74.96162499999991,
+    "warmReadAllMs": 90.85775000000012,
+    "projectionMs": 16.572374999999965,
+    "point20Ms": 2.128834000000097,
+    "update5Ms": 0.9514169999999922,
+    "delete5Ms": 0.48316700000009405
+  },
+  "serverVersion": "PostgreSQL 18.4 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit",
+  "empty": {
+    "logical": 41091047,
+    "allocated": 41144320,
+    "files": 977
+  },
+  "afterInsert": {
+    "logical": 330804733,
+    "allocated": 330858496,
+    "files": 987
+  },
+  "stored": {
+    "logical": 330949049,
+    "allocated": 331001856,
+    "files": 988
+  },
+  "incremental": {
+    "logical": 289858002,
+    "allocated": 289857536
+  },
+  "afterChurn": {
+    "logical": 330958173,
+    "allocated": 347779072,
+    "files": 988
+  },
+  "verified": true,
+  "maxRssBytes": 1266909184
+}
