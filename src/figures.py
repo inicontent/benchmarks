@@ -21,8 +21,8 @@ for ax,profile in zip(axes[0],profiles):
             groups.setdefault(r['engine'],[]).append(r['stored']['allocated']/1048576)
     ordered=sorted(groups,key=lambda k:statistics.median(groups[k]))
     vals=[statistics.median(groups[k]) for k in ordered]
-    colors=['#16a37a' if k=='inibase-gzip-patched' else '#77bea9' if k.startswith('inibase') else '#6d7c95' for k in ordered]
-    labels=[k.replace('inibase-gzip-patched','iniBase gzip + patch*').replace('inibase-gzip','iniBase gzip 3.6.0').replace('inibase','iniBase plain') for k in ordered]
+    colors=['#16a37a' if k=='inibase-gzip' else '#77bea9' if k.startswith('inibase') else '#6d7c95' for k in ordered]
+    labels=[k.replace('inibase-gzip-patched','iniBase gzip + patch*').replace('inibase-gzip','iniBase gzip '+run['metadata']['dependencies']['inibase']).replace('inibase','iniBase plain') for k in ordered]
     bars=ax.barh(labels,vals,color=colors,height=.65)
     ax.invert_yaxis(); ax.set_xscale('log'); ax.set_xlabel('Allocated disk MiB • logarithmic scale')
     ax.set_title(profile.upper(),fontweight='bold',loc='left',pad=18)
@@ -31,7 +31,8 @@ for ax,profile in zip(axes[0],profiles):
     ax.set_xlim(min(vals)*.7,max(vals)*2)
     for side in ['top','right']:ax.spines[side].set_visible(False)
 fig.suptitle(f'Database storage at {n:,} records',fontsize=20,fontweight='bold',y=.99)
-footer = f"Median of {run['metadata']['repeats']} trials, total allocated footprint after maintenance and close. Lower is better.\n*Unreleased append fix, separate from published iniBase 3.6.0. Failed correctness runs excluded; all failures retained in report.\nSynthetic data on {run['metadata']['cpu']}. Dedicated server totals include fixed cluster overhead. No cloud-price or speed claim."
+disclosure = "*Historical append patch; separately labeled from the published package." if "inibase-gzip-patched" in run["metadata"]["engines"] else "Published iniBase package, without runtime patches."
+footer = f"Median of {run['metadata']['repeats']} trials, total allocated footprint after maintenance and close. Lower is better.\n{disclosure} Failed correctness runs excluded; all failures retained in report.\nSynthetic data on {run['metadata']['cpu']}. Dedicated server totals include fixed cluster overhead. No cloud-price or speed claim."
 if len(profiles)==1:
     footer='\n'.join(textwrap.fill(line,115) for line in footer.splitlines())
 fig.text(.01,.02,footer,fontsize=10,ha='left')

@@ -1,3 +1,5 @@
+> Historical experiment for iniBase 3.6.0. The current suite uses published 3.7.0 without runtime patches. To reproduce this experiment, check out commit `99a67f9191d0936cb0275b352dcd6a7c904e1fcf`, which retains `src/patched-inibase.mjs` and its original dependency lock.
+
 # Unreleased iniBase gzip-append experiment
 
 `inibase-gzip` benchmarks the unmodified npm package 3.6.0. `inibase-gzip-patched` copies that exact package into ignored `.work/` and applies the narrowly scoped code transformation in `src/patched-inibase.mjs`. The baseline package and the user's iniBase repository are not changed.

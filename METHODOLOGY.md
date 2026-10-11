@@ -53,3 +53,7 @@ The runner rotates engine order by repetition, does not run engines concurrently
 - [classic-level](https://github.com/Level/classic-level)
 - [Embedded PostgreSQL launcher](https://github.com/leinelissen/embedded-postgres)
 - [MongoDB launcher](https://typegoose.github.io/mongodb-memory-server/)
+
+## Version transition to 3.7.0
+
+The current suite pins published iniBase 3.7.0 and uses no runtime patch. Historical 3.6.0 samples remain in `results/v3.6.0` and `results/v3.6.0-large-cms`, with their original metadata, failures, and patch labels. The current matrix reruns every competitor; it does not combine older competitor timings with new iniBase samples. Workloads, durability, caching, and application queries are unchanged. MongoDB now receives an explicitly allocated loopback port after a smoke-run port collision; storage and query settings are unchanged. Historical-versus-current lookup comparisons are separate-session observations on the same host, with uncontrolled OS cache and background activity.

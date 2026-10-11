@@ -5,14 +5,14 @@
   "inputBytes": 13620573,
   "expectedHash": "43cc599a5d1c4f26fa37f2e0e5b68615307c7e85d60e9c6ee41c836ec544a9f3",
   "timings": {
-    "insertMs": 32.284416,
-    "maintenanceMs": 49.140417,
-    "readAllMs": 6.81629199999999,
-    "warmReadAllMs": 8.177999999999997,
-    "projectionMs": 3.896792000000005,
-    "point20Ms": 0.4158749999999998,
-    "update5Ms": 0.4754169999999931,
-    "delete5Ms": 0.18654200000000287
+    "insertMs": 30.947250000000004,
+    "maintenanceMs": 42.651667,
+    "readAllMs": 6.365499999999997,
+    "warmReadAllMs": 6.958708999999999,
+    "projectionMs": 3.449542000000008,
+    "point20Ms": 0.34345799999999826,
+    "update5Ms": 0.4440829999999778,
+    "delete5Ms": 0.25016699999997627
   },
   "empty": {
     "logical": 8192,

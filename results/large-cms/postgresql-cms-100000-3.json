@@ -5,28 +5,28 @@
   "inputBytes": 136505586,
   "expectedHash": "8f946d74ca7ff4f6b841b7863c3834c7ec14b1084c5578bb037028bbcbf75196",
   "timings": {
-    "insertMs": 497.12254099999996,
-    "maintenanceMs": 105.63175000000001,
-    "readAllMs": 74.96162499999991,
-    "warmReadAllMs": 90.85775000000012,
-    "projectionMs": 16.572374999999965,
-    "point20Ms": 2.128834000000097,
-    "update5Ms": 0.9514169999999922,
-    "delete5Ms": 0.48316700000009405
+    "insertMs": 467.131708,
+    "maintenanceMs": 104.834834,
+    "readAllMs": 75.83454200000006,
+    "warmReadAllMs": 77.7119580000001,
+    "projectionMs": 17.60070799999994,
+    "point20Ms": 1.9249580000000606,
+    "update5Ms": 1.0584579999999733,
+    "delete5Ms": 0.41362500000013824
   },
   "serverVersion": "PostgreSQL 18.4 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit",
   "empty": {
-    "logical": 41091047,
+    "logical": 41091049,
     "allocated": 41144320,
     "files": 977
   },
   "afterInsert": {
-    "logical": 330804733,
+    "logical": 330804736,
     "allocated": 330858496,
     "files": 987
   },
   "stored": {
-    "logical": 330949049,
+    "logical": 330949051,
     "allocated": 331001856,
     "files": 988
   },
@@ -35,10 +35,10 @@
     "allocated": 289857536
   },
   "afterChurn": {
-    "logical": 330958173,
-    "allocated": 347779072,
+    "logical": 330958175,
+    "allocated": 331010048,
     "files": 988
   },
   "verified": true,
-  "maxRssBytes": 1266909184
+  "maxRssBytes": 1267449856
 }

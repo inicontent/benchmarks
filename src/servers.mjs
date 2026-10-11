@@ -91,6 +91,7 @@ export async function openServer(engine, root) {
 		const server = await MongoMemoryServer.create({
 			binary: { version: "8.2.6" },
 			instance: {
+				port: await freePort(),
 				dbPath,
 				storageEngine: "wiredTiger",
 				ip: "127.0.0.1",

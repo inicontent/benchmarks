@@ -5,10 +5,10 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { openAdapter } from "../src/adapters.mjs";
 import { dataset, digest } from "../src/data.mjs";
-test("unreleased gzip append preserves two large batches and quoted text", async () => {
+test("published 3.7.0 gzip append preserves two large batches and quoted text", async () => {
 	const root = await mkdtemp(join(tmpdir(), "inibase-append-test-"));
 	try {
-		const db = await openAdapter("inibase-gzip-patched", root);
+		const db = await openAdapter("inibase-gzip", root);
 		const rows = dataset("cms", 2000);
 		rows[1200].body =
 			"A customer's text with 'quotes', backslashes \\ and Unicode العربية";

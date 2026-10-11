@@ -96,7 +96,9 @@ lines.push(
 				.join("\n")
 		: "None.",
 	"",
-	"`inibase-gzip-patched` is an unreleased experiment, not the published iniBase package. See [patch details](../../patches/README.md). Native PostgreSQL/MongoDB and patched iniBase were collected in a separate sequential phase when metadata.phases is present; all phase metadata is retained.",
+	metadata.engines.includes("inibase-gzip-patched")
+		? "Historical iniBase 3.6.0 run with a separately labeled unreleased append patch. See [patch details](../../patches/README.md). Phase metadata is retained where applicable."
+		: `iniBase version: ${metadata.dependencies.inibase}. Published package, without runtime patches.`,
 	"",
 	"The complete samples, configuration, checksums, input sizes, churn footprints, and RSS measurements are preserved in JSON. Do not infer cloud prices or universal winners from this run.",
 	"",

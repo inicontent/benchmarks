@@ -6,12 +6,12 @@ Reproducible storage and workload comparisons maintained by the iniBase team. Th
 
 ## Storage highlights from this host
 
-At **10,000 records**, medians of three trials on Apple M5:
+**Published iniBase 3.7.0, without runtime patches.** At **10,000 records**, medians of three trials on Apple M5:
 
-- **Published iniBase 3.6.0 gzip, compact records:** 0.121 MiB allocated vs SQLite’s 0.438 MiB — **72.3% less disk**. All records verified.
-- **Unreleased gzip append fix, repetitive CMS content:** 0.188 MiB vs LevelDB’s 1.555 MiB and SQLite’s 13.063 MiB — **87.9% and 98.6% less disk**, respectively. The published gzip configuration failed correctness on this workload; these are explicitly patched results.
-- **High-entropy text:** DuckDB used slightly less disk than patched iniBase (7.012 vs 7.074 MiB).
-- **Speed tradeoff:** patched iniBase’s CMS bulk insert took 339.8 ms vs SQLite’s 32.3 ms. These are storage advantages, not an overall performance victory.
+- **Compact records, gzip:** 0.121 MiB allocated vs SQLite’s 0.438 MiB — **72.3% less disk**.
+- **Repetitive CMS content, gzip:** 0.188 MiB vs LevelDB’s 1.555 MiB and SQLite’s 13.062 MiB — **87.9% and 98.6% less disk**, respectively.
+- **High-entropy text:** DuckDB used 7.012 MiB; iniBase gzip used 7.074 MiB. Compression benefits depend on the data.
+- **Speed tradeoff:** iniBase gzip CMS bulk insert took 331.8 ms vs SQLite’s 30.9 ms. Storage advantages are not an overall performance victory.
 
 ![Storage across all three datasets, including competing winners](results/latest/storage.png)
 
@@ -19,28 +19,38 @@ Total allocated footprint after maintenance and clean close; synthetic fixtures,
 
 ## 100,000-record CMS scale run
 
-Three independent repetitions across all eleven configurations, using the same repetitive CMS fixture and 1,000-row insert batches:
+Three independent repetitions across all ten configurations, using the same repetitive CMS fixture and 1,000-row insert batches:
 
 | Configuration | Median allocated disk |
 |---|---:|
-| iniBase gzip + **unreleased fix** | 1.637 MiB |
+| iniBase 3.7.0 gzip | 1.637 MiB |
 | LevelDB | 15.387 MiB |
 | SQLite | 130.539 MiB |
 
-The experimental fix used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**. Published iniBase gzip failed verification in all three scale trials and is excluded from this comparison. The patched configuration's 20 application-key lookups took a median **87.9 seconds**, versus under a millisecond for SQLite/LevelDB; this is a material limitation of this query path.
+iniBase gzip used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**.
+
+### Application-key lookup improvement
+
+Each timing below is the median total for the same 20 application-key lookups at 100,000 records. Historical and current measurements were collected in separate sessions on this host; these are descriptive comparisons, not controlled statistical speedup estimates.
+
+| Configuration | Historical 3.6.0 run: 20 lookups | Published 3.7.0: 20 lookups |
+|---|---:|---:|
+| iniBase plain | 90640.6 ms | 1011.9 ms |
+| iniBase gzip | 87889.5 ms (historical append patch) | 1309.4 ms |
+
+Current SQLite: **0.410 ms**; LevelDB: **0.515 ms** for all 20 lookups. iniBase still searches the application `seq` field; these competitors use their native primary-key indexes. The current iniBase results require no runtime patch. Historical patch labels remain attached to historical measurements.
 
 ![100,000-record CMS storage comparison](results/large-cms/storage.png)
 
-See the [full scale report](results/large-cms/REPORT.md) for every engine, baseline growth, all timings, and failure logs in the linked raw data. This scale run is CMS-only; it does not establish the same advantage for high-entropy data.
+See the [full scale report](results/large-cms/REPORT.md) for every engine, baseline growth, timings, and any failure logs in the linked raw data. This scale run is CMS-only; it does not establish the same advantage for high-entropy data.
 
-Across the main and scale matrices: **231 trials, 222 verified successes, nine published-gzip correctness failures**. No failed sample is counted as a storage win. The [regression test](tests/gzip-append.test.mjs) passes for the separate experimental fix.
+Across the current main and scale matrices: **210 trials, 210 verified successes, 0 recorded failures**. No failed sample is counted as a storage win. The [large gzip-append regression test](tests/gzip-append.test.mjs) runs against the published package.
 
 ## Engines
 
 | Engine | Configuration |
 |---|---|
-| iniBase 3.6.0 | Plain column files; gzip column files; full durability; cache disabled |
-| iniBase gzip + unreleased patch | Separately labeled fix for a verified large-batch compressed append bug |
+| iniBase 3.7.0 | Plain column files; gzip column files; full durability; cache disabled |
 | SQLite | Node's SQLite binding; WAL; synchronous FULL; primary key |
 | DuckDB | Native Node binding; native column compression; primary key; appender bulk import |
 | PGlite | PostgreSQL compiled to WASM; persistent filesystem; relaxed durability disabled |
@@ -49,7 +59,7 @@ Across the main and scale matrices: **231 trials, 222 verified successes, nine p
 | LevelDB | Native classic-level through level; default Snappy compression; sync writes |
 | LMDB | Plain and LZ4-compressed MessagePack values; flushed writes |
 
-Exact package versions are pinned in `package-lock.json`. MongoDB's binary is pinned to 8.2.6. Native PostgreSQL is supplied by the pinned `embedded-postgres` package. Server versions are also recorded in raw results. These are eight engines and eleven configurations, not eleven unrelated database systems.
+Exact package versions are pinned in `package-lock.json`. MongoDB's binary is pinned to 8.2.6. Native PostgreSQL is supplied by the pinned `embedded-postgres` package. Server versions are also recorded in raw results. These are eight engines and ten configurations, not ten unrelated database systems.
 
 ## Run
 
@@ -65,7 +75,7 @@ npm run bench -- --rows=100000 --profiles=cms --repeats=3 --output=results/large
 npm run bench -- --engines=inibase,inibase-gzip,sqlite,duckdb --profiles=cms --rows=10000
 ```
 
-The default run covers 1,000 and 10,000 records, three datasets, eleven configurations, and three independent repetitions (198 trials). Engines run sequentially in fresh worker processes and fresh database directories. Engine order rotates across repetitions. Each worker has a five-minute limit. Use a fresh output directory for each experiment.
+The default run covers 1,000 and 10,000 records, three datasets, ten configurations, and three independent repetitions (180 trials). Engines run sequentially in fresh worker processes and fresh database directories. Engine order rotates across repetitions. Each worker has a five-minute limit. Use a fresh output directory for each experiment.
 
 Installation downloads native dependencies; MongoDB's launcher may download its pinned server binary on first use. The launcher name `mongodb-memory-server` does **not** mean this benchmark uses an in-memory engine: the adapter explicitly selects WiredTiger and a persistent data directory. Both native servers bind only to loopback, use temporary benchmark directories, and are shut down after each storage checkpoint. PostgreSQL uses a random per-worker password. No existing database is contacted.
 
@@ -80,9 +90,9 @@ Native libraries/server startup may require execution outside restrictive sandbo
 
 `cms` uses explicitly repetitive HTML content, `mixed` uses deterministic high-entropy hexadecimal text of similar size, and `compact` uses short records. These bracket compression behavior; none is a sample of a real customer's production workload.
 
-## Known correctness failure and unreleased experiment
+## Historical results
 
-Published iniBase 3.6.0 gzip fails full-content verification for 10,000-row CMS/mixed datasets and the 100,000-row CMS dataset on this host. Its shell-based append exceeds ARG_MAX and silently leaves part of a column unwritten. These failures are retained and excluded from rankings. `inibase-gzip-patched` is a separate, unreleased configuration with a small Node gzip/appendFile fix; see [patch details](patches/README.md). Run `npm test` for the focused regression test. The default benchmark exits nonzero while known baseline failures remain.
+The original 3.6.0 measurements, nine correctness failures, and separately labeled append-patch experiment remain available in the [historical summary](HISTORY-3.6.0.md), [main report](results/v3.6.0/REPORT.md), and [100,000-record report](results/v3.6.0-large-cms/REPORT.md). They have not been relabeled as 3.7.0. The current adapter imports published 3.7.0 directly and applies no runtime source transformations.
 
 ## Reading the results
 

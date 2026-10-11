@@ -11,7 +11,6 @@ export const engines = [
 	"lmdb-lz4",
 	"postgresql",
 	"mongodb",
-	"inibase-gzip-patched",
 ];
 const schema =
 	"seq INTEGER PRIMARY KEY, title TEXT NOT NULL, category TEXT NOT NULL, body TEXT NOT NULL, score INTEGER NOT NULL";
@@ -25,10 +24,7 @@ const values = (rows) =>
 		.join(",");
 export async function openAdapter(engine, root) {
 	if (engine.startsWith("inibase")) {
-		const patched = engine.endsWith("-patched")
-			? await (await import("./patched-inibase.mjs")).patchedInibase()
-			: null;
-		const Inibase = patched?.Inibase ?? (await import("inibase")).default;
+		const Inibase = (await import("inibase")).default;
 		const db = new Inibase("db", root);
 		if (!(await db.getTable("records").catch(() => null)))
 			await db.createTable(
@@ -41,9 +37,7 @@ export async function openAdapter(engine, root) {
 				{ compression: engine.includes("gzip"), cache: false, decodeID: true },
 			);
 		return {
-			version: patched
-				? `3.6.0 + unreleased append patch sha256:${patched.patchHash}`
-				: "3.6.0",
+			version: "3.7.0",
 			insert: (rows) => db.post("records", structuredClone(rows)),
 			all: async (columns = fields) =>
 				(await db.get("records", undefined, {

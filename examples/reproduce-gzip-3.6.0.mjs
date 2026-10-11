@@ -1,3 +1,6 @@
+import { readFile } from "node:fs/promises";
+const pkg = JSON.parse(await readFile(new URL("../node_modules/inibase/package.json", import.meta.url), "utf8"));
+if (pkg.version !== "3.6.0") throw new Error("Historical reproduction requires iniBase 3.6.0. Check out commit 99a67f9 and run npm ci.");
 import { openAdapter } from "../src/adapters.mjs";
 import { dataset, fields } from "../src/data.mjs";
 import { mkdtemp, rm } from "node:fs/promises";
