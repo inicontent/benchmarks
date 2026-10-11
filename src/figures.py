@@ -31,7 +31,7 @@ for ax,profile in zip(axes[0],profiles):
     ax.set_xlim(min(vals)*.7,max(vals)*2)
     for side in ['top','right']:ax.spines[side].set_visible(False)
 fig.suptitle(f'Database storage at {n:,} records',fontsize=20,fontweight='bold',y=.99)
-disclosure = "*Historical append patch; separately labeled from the published package." if "inibase-gzip-patched" in run["metadata"]["engines"] else "Published iniBase package, without runtime patches."
+disclosure = "*Historical append patch; separately labeled from the published package." if "inibase-gzip-patched" in run["metadata"]["engines"] else f"Published iniBase {run['metadata']['dependencies']['inibase']}."
 footer = f"Median of {run['metadata']['repeats']} trials, total allocated footprint after maintenance and close. Lower is better.\n{disclosure} Failed correctness runs excluded; all failures retained in report.\nSynthetic data on {run['metadata']['cpu']}. Dedicated server totals include fixed cluster overhead. No cloud-price or speed claim."
 if len(profiles)==1:
     footer='\n'.join(textwrap.fill(line,115) for line in footer.splitlines())

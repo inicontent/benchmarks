@@ -6,7 +6,7 @@ Reproducible storage and workload comparisons maintained by the iniBase team. Th
 
 ## Storage highlights from this host
 
-**Published iniBase 3.7.0, without runtime patches.** At **10,000 records**, medians of three trials on Apple M5:
+**Published iniBase 3.7.0.** At **10,000 records**, medians of three trials on Apple M5:
 
 - **Compact records, gzip:** 0.121 MiB allocated vs SQLite’s 0.438 MiB — **72.3% less disk**.
 - **Repetitive CMS content, gzip:** 0.188 MiB vs LevelDB’s 1.555 MiB and SQLite’s 13.062 MiB — **87.9% and 98.6% less disk**, respectively.
@@ -29,16 +29,18 @@ Three independent repetitions across all ten configurations, using the same repe
 
 iniBase gzip used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**.
 
-### Application-key lookup improvement
+### Application-key lookup performance
 
-Each timing below is the median total for the same 20 application-key lookups at 100,000 records. Historical and current measurements were collected in separate sessions on this host; these are descriptive comparisons, not controlled statistical speedup estimates.
+Median total for 20 application-key lookups at 100,000 records, across three trials:
 
-| Configuration | Historical 3.6.0 run: 20 lookups | Published 3.7.0: 20 lookups |
-|---|---:|---:|
-| iniBase plain | 90640.6 ms | 1011.9 ms |
-| iniBase gzip | 87889.5 ms (historical append patch) | 1309.4 ms |
+| Configuration | 20 lookups |
+|---|---:|
+| iniBase 3.7.0 plain | 1011.9 ms |
+| iniBase 3.7.0 gzip | 1309.4 ms |
+| SQLite | 0.410 ms |
+| LevelDB | 0.515 ms |
 
-Current SQLite: **0.410 ms**; LevelDB: **0.515 ms** for all 20 lookups. iniBase still searches the application `seq` field; these competitors use their native primary-key indexes. The current iniBase results require no runtime patch. Historical patch labels remain attached to historical measurements.
+iniBase searches the application `seq` field; SQLite and LevelDB use their native primary-key indexes. Indexed competitors remain faster for this workload. See the [historical comparison](HISTORY-3.6.0.md#comparison-with-published-370) for the change from the earlier release.
 
 ![100,000-record CMS storage comparison](results/large-cms/storage.png)
 
@@ -92,7 +94,7 @@ Native libraries/server startup may require execution outside restrictive sandbo
 
 ## Historical results
 
-The original 3.6.0 measurements, nine correctness failures, and separately labeled append-patch experiment remain available in the [historical summary](HISTORY-3.6.0.md), [main report](results/v3.6.0/REPORT.md), and [100,000-record report](results/v3.6.0-large-cms/REPORT.md). They have not been relabeled as 3.7.0. The current adapter imports published 3.7.0 directly and applies no runtime source transformations.
+Earlier measurements and their original methodology are preserved in the [historical summary](HISTORY-3.6.0.md), [main report](results/v3.6.0/REPORT.md), and [100,000-record report](results/v3.6.0-large-cms/REPORT.md). All current results above use the published iniBase 3.7.0 package.
 
 ## Reading the results
 

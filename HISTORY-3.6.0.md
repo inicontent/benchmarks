@@ -105,3 +105,14 @@ python3 -m venv .venv
 ```
 
 The manual GitHub Actions workflow uploads raw results even when correctness checks fail. Linux CI is a rerun target, not evidence that the checked-in macOS measurements also hold on Linux.
+
+## Comparison with published 3.7.0
+
+Each timing below is the median total for the same 20 application-key lookups at 100,000 records. Historical and current measurements were collected in separate sessions on this host; these are descriptive comparisons, not controlled statistical speedup estimates.
+
+| Configuration | Historical 3.6.0 run: 20 lookups | Published 3.7.0: 20 lookups |
+|---|---:|---:|
+| iniBase plain | 90640.6 ms | 1011.9 ms |
+| iniBase gzip | 87889.5 ms (historical append patch) | 1309.4 ms |
+
+Current SQLite: **0.410 ms**; LevelDB: **0.515 ms** for all 20 lookups. iniBase still searches the application `seq` field; these competitors use their native primary-key indexes. The current iniBase results require no runtime patch. Historical patch labels remain attached to historical measurements.
