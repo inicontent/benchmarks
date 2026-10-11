@@ -1,0 +1,43 @@
+{
+  "engine": "pglite",
+  "profile": "mixed",
+  "rows": 1000,
+  "inputBytes": 1361173,
+  "expectedHash": "e9c40dd35497c7d98d04cf2211ea18bf190cdf9f9b9ffcb2f0ec444aa96099f5",
+  "timings": {
+    "insertMs": 9.555541999999946,
+    "maintenanceMs": 3.083833000000027,
+    "readAllMs": 4.433750000000032,
+    "warmReadAllMs": 3.1586660000000393,
+    "projectionMs": 1.3813330000000406,
+    "point20Ms": 3.736750000000029,
+    "update5Ms": 1.0912080000000515,
+    "delete5Ms": 0.6377909999999929
+  },
+  "empty": {
+    "logical": 39870504,
+    "allocated": 39915520,
+    "files": 975
+  },
+  "afterInsert": {
+    "logical": 41295967,
+    "allocated": 41345024,
+    "files": 977
+  },
+  "stored": {
+    "logical": 41304104,
+    "allocated": 41349120,
+    "files": 977
+  },
+  "incremental": {
+    "logical": 1433600,
+    "allocated": 1433600
+  },
+  "afterChurn": {
+    "logical": 41320488,
+    "allocated": 41422848,
+    "files": 977
+  },
+  "verified": true,
+  "maxRssBytes": 1111867392
+}

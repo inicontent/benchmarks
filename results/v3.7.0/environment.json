@@ -1,0 +1,47 @@
+{
+  "runId": "2026-10-11T09-19-47.745Z",
+  "node": "v26.9.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "os": "27.0.0",
+  "cpu": "Apple M5",
+  "cores": 10,
+  "ramBytes": 17179869184,
+  "sizes": [
+    1000,
+    10000
+  ],
+  "repeats": 3,
+  "engines": [
+    "inibase",
+    "inibase-gzip",
+    "sqlite",
+    "duckdb",
+    "pglite",
+    "leveldb",
+    "lmdb",
+    "lmdb-lz4",
+    "postgresql",
+    "mongodb"
+  ],
+  "profiles": [
+    "cms",
+    "mixed",
+    "compact"
+  ],
+  "dependencies": {
+    "@duckdb/node-api": "1.5.6-r.1",
+    "@electric-sql/pglite": "0.5.8",
+    "embedded-postgres": "18.4.0-beta.17",
+    "inibase": "3.7.0",
+    "level": "10.0.0",
+    "lmdb": "3.5.7",
+    "mongodb": "7.7.0",
+    "mongodb-memory-server": "11.3.0",
+    "pg": "8.23.1"
+  },
+  "batchSize": 1000,
+  "seed": 42,
+  "iniBaseDurability": "full",
+  "concurrency": 1
+}

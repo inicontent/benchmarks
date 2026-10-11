@@ -5,14 +5,14 @@
   "inputBytes": 136505586,
   "expectedHash": "8f946d74ca7ff4f6b841b7863c3834c7ec14b1084c5578bb037028bbcbf75196",
   "timings": {
-    "insertMs": 298.02345899999995,
-    "maintenanceMs": 394.60137499999996,
-    "readAllMs": 92.65016700000012,
-    "warmReadAllMs": 95.59954199999993,
-    "projectionMs": 38.485374999999976,
-    "point20Ms": 0.41020899999989524,
-    "update5Ms": 0.44412499999998545,
-    "delete5Ms": 0.24308300000006966
+    "insertMs": 358.50429199999996,
+    "maintenanceMs": 496.15704199999993,
+    "readAllMs": 110.47545799999989,
+    "warmReadAllMs": 110.35649999999987,
+    "projectionMs": 45.18908299999998,
+    "point20Ms": 0.44070800000008603,
+    "update5Ms": 0.731499999999869,
+    "delete5Ms": 0.30233399999997346
   },
   "empty": {
     "logical": 8192,
@@ -39,5 +39,5 @@
     "files": 1
   },
   "verified": true,
-  "maxRssBytes": 1264369664
+  "maxRssBytes": 1264648192
 }

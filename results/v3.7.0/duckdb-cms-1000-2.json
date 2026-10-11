@@ -1,0 +1,43 @@
+{
+  "engine": "duckdb",
+  "profile": "cms",
+  "rows": 1000,
+  "inputBytes": 1359066,
+  "expectedHash": "d0be7423871adf277513c7cfe8fac55f7ef294ab42d4de443daa75b68d1aa7ab",
+  "timings": {
+    "insertMs": 1.972417,
+    "maintenanceMs": 3.180917000000001,
+    "readAllMs": 2.176290999999999,
+    "warmReadAllMs": 1.7553330000000003,
+    "projectionMs": 0.918875000000007,
+    "point20Ms": 3.0082919999999973,
+    "update5Ms": 1.0655000000000001,
+    "delete5Ms": 0.7772500000000093
+  },
+  "empty": {
+    "logical": 274432,
+    "allocated": 274432,
+    "files": 1
+  },
+  "afterInsert": {
+    "logical": 1585890,
+    "allocated": 1589248,
+    "files": 2
+  },
+  "stored": {
+    "logical": 1060864,
+    "allocated": 1060864,
+    "files": 1
+  },
+  "incremental": {
+    "logical": 786432,
+    "allocated": 786432
+  },
+  "afterChurn": {
+    "logical": 1585152,
+    "allocated": 1585152,
+    "files": 1
+  },
+  "verified": true,
+  "maxRssBytes": 114622464
+}

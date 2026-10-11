@@ -13,7 +13,12 @@ root = Path(sys.argv[1] if len(sys.argv)>1 else 'results/latest')
 run = json.loads((root / 'results.json').read_text())
 n=max(run['metadata']['sizes'])
 profiles=run['metadata']['profiles']
-fig, axes=plt.subplots(1,len(profiles),figsize=(9 if len(profiles)==1 else 6*len(profiles),7),squeeze=False)
+def label(k):
+    version=run['metadata']['dependencies']['inibase']
+    return {'inibase':f'iniBase {version} plain', 'inibase-gzip':f'iniBase {version} gzip',
+            'inibase-log':f'iniBase {version} plain + log', 'inibase-gzip-log':f'iniBase {version} gzip + log',
+            'inibase-gzip-patched':'iniBase gzip + patch*'}.get(k,k)
+fig, axes=plt.subplots(1,len(profiles),figsize=(9 if len(profiles)==1 else 6*len(profiles),8),squeeze=False)
 for ax,profile in zip(axes[0],profiles):
     groups={}
     for r in run['results']:
@@ -22,7 +27,7 @@ for ax,profile in zip(axes[0],profiles):
     ordered=sorted(groups,key=lambda k:statistics.median(groups[k]))
     vals=[statistics.median(groups[k]) for k in ordered]
     colors=['#16a37a' if k=='inibase-gzip' else '#77bea9' if k.startswith('inibase') else '#6d7c95' for k in ordered]
-    labels=[k.replace('inibase-gzip-patched','iniBase gzip + patch*').replace('inibase-gzip','iniBase gzip '+run['metadata']['dependencies']['inibase']).replace('inibase','iniBase plain') for k in ordered]
+    labels=[label(k) for k in ordered]
     bars=ax.barh(labels,vals,color=colors,height=.65)
     ax.invert_yaxis(); ax.set_xscale('log'); ax.set_xlabel('Allocated disk MiB • logarithmic scale')
     ax.set_title(profile.upper(),fontweight='bold',loc='left',pad=18)

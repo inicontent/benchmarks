@@ -1,6 +1,6 @@
 # Measured results
 
-Run: 2026-10-11T09-21-50.365Z. Apple M5; darwin/arm64; Node v26.9.0.
+Run: 2026-10-11T19-14-49.144Z. Apple M5; darwin/arm64; Node v26.9.0.
 
 Each cell is a median of 3 independent runs when complete. All successful runs passed full-content SHA-256 verification, projected-content verification, and CRUD checks.
 
@@ -12,34 +12,40 @@ Storage is measured after each engine’s documented maintenance and clean close
 
 | Engine | Runs | Total MiB | Allocated MiB | Growth logical MiB | Growth allocated MiB | Insert ms | Full read ms | Projection ms |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| inibase-gzip | 3 | 1.622 | 1.637 | 1.621 | 1.633 | 3223.0 | 211.1 | 44.3 |
-| leveldb | 3 | 15.295 | 15.387 | 15.295 | 15.375 | 281.1 | 186.9 | 166.2 |
-| lmdb-lz4 | 3 | 18.914 | 19.387 | 18.875 | 19.344 | 1391.6 | 140.0 | 111.7 |
-| mongodb | 3 | 211.291 | 21.918 | 10.988 | 21.555 | 616.3 | 330.6 | 82.5 |
-| duckdb | 3 | 48.512 | 48.762 | 48.250 | 48.500 | 849.1 | 137.5 | 18.9 |
-| inibase | 3 | 127.597 | 127.613 | 127.596 | 127.609 | 6039.7 | 178.1 | 47.1 |
-| sqlite | 3 | 130.539 | 130.539 | 130.531 | 130.531 | 299.9 | 91.0 | 38.2 |
-| lmdb | 3 | 149.352 | 149.355 | 149.313 | 149.313 | 544.1 | 138.9 | 86.4 |
-| pglite | 3 | 314.445 | 314.488 | 276.422 | 276.422 | 855.7 | 322.7 | 131.2 |
-| postgresql | 3 | 315.618 | 315.668 | 276.430 | 276.430 | 467.1 | 76.5 | 17.6 |
+| inibase-gzip | 3 | 1.622 | 1.637 | 1.621 | 1.633 | 3141.9 | 258.7 | 63.1 |
+| inibase-gzip-log | 3 | 1.622 | 1.641 | 1.621 | 1.633 | 3194.7 | 257.6 | 64.1 |
+| leveldb | 3 | 15.295 | 15.387 | 15.295 | 15.375 | 316.7 | 231.3 | 227.0 |
+| lmdb-lz4 | 3 | 18.914 | 19.449 | 18.875 | 19.406 | 1552.2 | 170.7 | 135.1 |
+| mongodb | 3 | 211.241 | 22.523 | 10.938 | 22.160 | 636.2 | 408.6 | 113.7 |
+| duckdb | 3 | 47.012 | 47.512 | 46.750 | 47.250 | 1051.2 | 171.5 | 23.6 |
+| inibase | 3 | 127.597 | 127.613 | 127.596 | 127.609 | 6629.7 | 229.7 | 58.9 |
+| inibase-log | 3 | 127.597 | 127.617 | 127.596 | 127.609 | 7305.5 | 257.8 | 64.9 |
+| sqlite | 3 | 130.539 | 130.539 | 130.531 | 130.531 | 358.5 | 113.9 | 47.7 |
+| lmdb | 3 | 149.352 | 149.355 | 149.313 | 149.313 | 522.3 | 167.7 | 113.2 |
+| postgresql | 3 | 315.618 | 315.668 | 276.430 | 276.430 | 580.7 | 105.3 | 26.1 |
+| pglite | 3 | 314.445 | 327.637 | 276.422 | 289.570 | 1084.9 | 421.3 | 168.3 |
 
 | Engine | 20 lookups ms | 5 updates ms | 5 deletes ms | Maintenance ms | Insert min–max ms |
 |---|---:|---:|---:|---:|---:|
-| inibase-gzip | 1309.4 | 4270.3 | 1655.4 | 0.0 | 3003.7–3228.9 |
-| leveldb | 0.5 | 0.7 | 0.3 | 2.6 | 264.7–283.6 |
-| lmdb-lz4 | 0.3 | 19.2 | 20.0 | 0.0 | 1374.7–1392.5 |
-| mongodb | 6.7 | 18.4 | 20.4 | 45.0 | 615.5–624.9 |
-| duckdb | 3.7 | 2.0 | 0.8 | 199.4 | 846.4–856.5 |
-| inibase | 1011.9 | 598.6 | 949.3 | 0.0 | 5934.9–6912.0 |
-| sqlite | 0.4 | 0.7 | 0.3 | 394.6 | 298.0–301.9 |
-| lmdb | 0.3 | 18.3 | 19.1 | 0.1 | 522.3–545.1 |
-| pglite | 3.4 | 1.3 | 0.6 | 104.8 | 837.4–870.4 |
-| postgresql | 1.9 | 1.1 | 0.5 | 104.7 | 466.1–467.7 |
+| inibase-gzip | 1661.8 | 5174.4 | 1932.1 | 0.0 | 2482.4–3437.7 |
+| inibase-gzip-log | 1588.0 | 175.1 | 3273.6 | 0.0 | 2593.7–3463.3 |
+| leveldb | 0.6 | 0.8 | 0.5 | 3.0 | 299.6–324.4 |
+| lmdb-lz4 | 0.4 | 20.0 | 20.0 | 0.0 | 1515.1–1587.7 |
+| mongodb | 7.2 | 18.1 | 20.2 | 148.8 | 635.6–666.1 |
+| duckdb | 3.9 | 2.4 | 0.9 | 231.0 | 1041.8–1090.8 |
+| inibase | 1296.4 | 738.8 | 1208.2 | 0.0 | 6572.7–7599.3 |
+| inibase-log | 1313.9 | 178.2 | 1382.6 | 0.0 | 6764.8–9103.3 |
+| sqlite | 0.4 | 0.7 | 0.3 | 497.6 | 352.8–377.9 |
+| lmdb | 0.4 | 19.1 | 20.0 | 0.0 | 420.2–533.5 |
+| postgresql | 2.4 | 1.0 | 0.5 | 124.6 | 546.9–589.4 |
+| pglite | 4.5 | 1.7 | 0.7 | 135.4 | 1044.3–1099.0 |
 
 ## Failures (excluded from rankings)
 
 None.
 
-iniBase version: 3.7.0. Published package, without runtime patches.
+iniBase version: 3.8.0. Published package, without runtime patches.
+
+The `inibase-log` and `inibase-gzip-log` configurations explicitly enable the published opt-in `log: true` setting. Other iniBase configurations retain the default rewrite path. The five updates do not measure sustained compaction amortization; the first subsequent delete may include automatic compaction. The main storage snapshot precedes updates and does not measure peak update-log space. Update-log tables currently restrict transactions and schema changes; these capabilities are not exercised here.
 
 The complete samples, configuration, checksums, input sizes, churn footprints, and RSS measurements are preserved in JSON. Do not infer cloud prices or universal winners from this run.

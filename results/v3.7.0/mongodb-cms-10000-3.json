@@ -1,0 +1,44 @@
+{
+  "engine": "mongodb",
+  "profile": "cms",
+  "rows": 10000,
+  "inputBytes": 13620573,
+  "expectedHash": "43cc599a5d1c4f26fa37f2e0e5b68615307c7e85d60e9c6ee41c836ec544a9f3",
+  "timings": {
+    "insertMs": 68.61887499999989,
+    "maintenanceMs": 148.38275,
+    "readAllMs": 41.51679200000012,
+    "warmReadAllMs": 37.05429200000003,
+    "projectionMs": 9.65641699999992,
+    "point20Ms": 5.165332999999919,
+    "update5Ms": 18.866999999999962,
+    "delete5Ms": 20.205249999999978
+  },
+  "serverVersion": "8.2.6",
+  "empty": {
+    "logical": 210033788,
+    "allocated": 380928,
+    "files": 25
+  },
+  "afterInsert": {
+    "logical": 210043922,
+    "allocated": 1413120,
+    "files": 26
+  },
+  "stored": {
+    "logical": 211671238,
+    "allocated": 3035136,
+    "files": 26
+  },
+  "incremental": {
+    "logical": 1637450,
+    "allocated": 2654208
+  },
+  "afterChurn": {
+    "logical": 211794118,
+    "allocated": 3227648,
+    "files": 26
+  },
+  "verified": true,
+  "maxRssBytes": 336887808
+}

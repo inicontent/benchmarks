@@ -1,0 +1,44 @@
+{
+  "engine": "inibase-log",
+  "profile": "cms",
+  "rows": 100000,
+  "inputBytes": 136505586,
+  "expectedHash": "8f946d74ca7ff4f6b841b7863c3834c7ec14b1084c5578bb037028bbcbf75196",
+  "timings": {
+    "insertMs": 9103.31325,
+    "maintenanceMs": 0.0321250000015425,
+    "readAllMs": 298.8872080000001,
+    "warmReadAllMs": 195.87354100000084,
+    "projectionMs": 73.4838749999999,
+    "point20Ms": 1415.0612920000003,
+    "update5Ms": 189.04470799999945,
+    "delete5Ms": 1565.6677080000009
+  },
+  "serverVersion": "3.8.0",
+  "empty": {
+    "logical": 539,
+    "allocated": 8192,
+    "files": 6
+  },
+  "afterInsert": {
+    "logical": 133795019,
+    "allocated": 133816320,
+    "files": 14
+  },
+  "stored": {
+    "logical": 133795019,
+    "allocated": 133816320,
+    "files": 14
+  },
+  "incremental": {
+    "logical": 133794480,
+    "allocated": 133808128
+  },
+  "afterChurn": {
+    "logical": 133788343,
+    "allocated": 133812224,
+    "files": 14
+  },
+  "verified": true,
+  "maxRssBytes": 1298235392
+}

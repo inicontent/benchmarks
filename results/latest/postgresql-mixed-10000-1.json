@@ -5,14 +5,14 @@
   "inputBytes": 13631679,
   "expectedHash": "8f1b6eef7c8b18c7cee7c47a9a4e34d787c8581adea12378c8e916d4b012eb07",
   "timings": {
-    "insertMs": 47.26220799999999,
-    "maintenanceMs": 14.456790999999953,
-    "readAllMs": 7.911040999999955,
-    "warmReadAllMs": 8.168583000000012,
-    "projectionMs": 1.756832999999915,
-    "point20Ms": 2.331957999999986,
-    "update5Ms": 0.9744170000000167,
-    "delete5Ms": 0.5214160000000447
+    "insertMs": 48.57037500000001,
+    "maintenanceMs": 15.366750000000025,
+    "readAllMs": 8.181332999999995,
+    "warmReadAllMs": 7.969375000000014,
+    "projectionMs": 1.9110000000000582,
+    "point20Ms": 2.210708000000068,
+    "update5Ms": 0.8667920000000322,
+    "delete5Ms": 0.5001249999999118
   },
   "serverVersion": "PostgreSQL 18.4 on x86_64-apple-darwin24.6.0, compiled by Apple clang version 17.0.0 (clang-1700.6.3.2), 64-bit",
   "empty": {
@@ -40,5 +40,5 @@
     "files": 980
   },
   "verified": true,
-  "maxRssBytes": 282247168
+  "maxRssBytes": 308641792
 }

@@ -1,100 +1,109 @@
 # iniContent database benchmarks
 
-**100,000 CMS records in 1.64 MiB, with a full read in 211 ms.** Published iniBase 3.7.0 combines a small compressed footprint with efficient bulk reads on this repetitive CMS fixture.
+**Published iniBase 3.8.0: 100,000 repetitive CMS records in 1.64 MiB, with five logged updates in 175.1 ms.** Enable `log: true` to use the new incremental update path; default tables retain whole-column updates.
 
-Reproducible comparisons maintained by the iniBase team. All engines store the same application data, and every successful trial verifies its contents. Measurements below come from one Apple M5 host; results depend on the workload and environment.
+Reproducible comparisons maintained by the iniBase team. Every successful trial verifies the same application data. Measurements come from one Apple M5 host; results depend on workload and environment.
 
 **[Read the measured report](results/latest/REPORT.md)** · **[100,000-record CMS report](results/large-cms/REPORT.md)** · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
 
 ## Where iniBase stands out
 
-At **100,000 repetitive CMS records**, medians of three trials with published **iniBase 3.7.0 gzip**:
+At **100,000 repetitive CMS records**, medians of three trials with **iniBase 3.8.0 gzip + log**:
 
 | Measured strength | Result |
 |---|---|
-| Small storage footprint | **1.637 MiB** allocated — **89.4% less than LevelDB**, **98.7% less than SQLite** |
-| Read the entire dataset | **211 ms** — 36% less time than MongoDB and 35% less than PGlite in this run |
-| Read only the fields you need | **44 ms** to return `seq` and `category` for all 100,000 records |
-| Bulk loading | **3.22 seconds** for 100,000 records — about **31,027 records/second** in 1,000-record batches |
-| Verified results | **210/210 trials passed** across the complete comparison suite |
+| Small storage footprint | **1.641 MiB** allocated after bulk loading — **89.3% less than LevelDB**, **98.7% less than SQLite** |
+| Incremental updates | **175.1 ms** for five committed updates, versus **5174.4 ms** with the 3.8.0 default gzip rewrite path |
+| Read the entire dataset | **258 ms** for 100,000 records before updates |
+| Read only selected fields | **64 ms** for `seq` and `category` across 100,000 records before updates |
 
-These results support iniBase's strengths for compact CMS storage and bulk reads. The full tables below also show faster readers and writers: competitors lead on bulk inserts and indexed record updates/lookups. Read timings are cache-affected; insert timings include commit/flush and exclude separately reported maintenance.
+These are short, sequential workloads. The update-log configuration defers column rewrites; the first subsequent delete may perform compaction. The full tables retain that delete cost and all competitors. This is not a sustained-write or equal-feature comparison.
 
 ## Storage highlights from this host
 
-**Published iniBase 3.7.0.** At **10,000 records**, medians of three trials on Apple M5:
+At **10,000 records**, medians of three trials with **iniBase 3.8.0 gzip + log**:
 
-- **Compact records, gzip:** 0.121 MiB allocated vs SQLite’s 0.438 MiB — **72.3% less disk**.
-- **Repetitive CMS content, gzip:** 0.188 MiB vs LevelDB’s 1.555 MiB and SQLite’s 13.062 MiB — **87.9% and 98.6% less disk**, respectively.
-- **High-entropy text:** DuckDB used 7.012 MiB; iniBase gzip used 7.074 MiB. Compression benefits depend on the data.
-- **Speed tradeoff:** iniBase gzip CMS bulk insert took 331.8 ms vs SQLite’s 30.9 ms. Storage advantages are not an overall performance victory.
+- **Compact records:** 0.125 MiB allocated versus SQLite's 0.438 MiB.
+- **Repetitive CMS content:** 0.191 MiB versus LevelDB's 1.555 MiB and SQLite's 13.062 MiB.
+- **High-entropy text:** iniBase gzip + log uses 7.078 MiB; DuckDB uses 7.012 MiB. Compression benefits depend on the data.
 
-![Storage across all three datasets, including competing winners](results/latest/storage.png)
+![Storage across all three datasets](results/latest/storage.png)
 
-Total allocated footprint after maintenance and clean close; synthetic fixtures, no replicas/backups. The [report](results/latest/REPORT.md) also shows empty-baseline growth, every engine, timings, and failures. Native server totals include fixed cluster costs.
+Total allocated footprint after bulk loading, maintenance, and close, **before updates**. The report includes every engine and empty-baseline growth. Native server totals include fixed cluster overhead; replicas and backups are excluded.
 
 ## 100,000-record CMS scale run
 
-Three independent repetitions across all ten configurations, using the same repetitive CMS fixture and 1,000-row insert batches:
-
-| Configuration | Median allocated disk |
-|---|---:|
-| iniBase 3.7.0 gzip | 1.637 MiB |
-| LevelDB | 15.387 MiB |
-| SQLite | 130.539 MiB |
-
-iniBase gzip used **89.4% less allocated disk than LevelDB** and **98.7% less than SQLite**.
+Three independent repetitions across twelve configurations, with the same repetitive CMS fixture and 1,000-row insert batches.
 
 ### Read, insert, update, and delete performance
 
-At **100,000 CMS records**, medians of three trials. **All timings are total milliseconds; lower is better.** These are database API operations, not HTTP endpoint benchmarks.
+**All timings are total milliseconds; lower is better.** Database API operations, not HTTP endpoints:
 
-- **`post` / insert:** load all 100,000 records in batches of 1,000; includes commit/flush, excludes separately reported maintenance.
-- **`get` / read:** materialize all 100,000 records; projection reads only `seq` and `category`. Reads are affected by the OS cache.
-- **`put` / update:** five separate, committed updates to selected records, setting `score` to `-1`; includes locating each record.
-- **Delete:** five separate, committed record deletions; includes locating each record.
+- **`post`:** load all 100,000 records in 1,000-record batches, including commit/flush and excluding separately reported maintenance.
+- **`get`:** read all records or project `seq` and `category`. Timings precede updates and are affected by the OS cache.
+- **`put`:** five separately committed updates, setting `score` to `-1`, including application-key selection.
+- **Delete:** five separately committed deletions, including selection and any compaction triggered by the engine.
 
 | Configuration | `post`: insert 100k | `get`: read 100k | `get`: projection 100k | `put`: 5 updates | 5 deletes |
 |---|---:|---:|---:|---:|---:|
-| iniBase 3.7.0 plain | 6039.691 | 178.096 | 47.142 | 598.635 | 949.284 |
-| iniBase 3.7.0 gzip | 3223.035 | 211.138 | 44.270 | 4270.342 | 1655.426 |
-| SQLite | 299.916 | 90.997 | 38.191 | 0.695 | 0.282 |
-| DuckDB | 849.125 | 137.520 | 18.897 | 2.028 | 0.803 |
-| PGlite | 855.663 | 322.703 | 131.160 | 1.257 | 0.610 |
-| PostgreSQL | 467.132 | 76.522 | 17.601 | 1.055 | 0.457 |
-| MongoDB | 616.344 | 330.629 | 82.456 | 18.436 | 20.398 |
-| LevelDB | 281.120 | 186.870 | 166.188 | 0.682 | 0.260 |
-| LMDB | 544.114 | 138.888 | 86.385 | 18.286 | 19.139 |
-| LMDB LZ4 | 1391.573 | 139.965 | 111.669 | 19.158 | 20.010 |
+| iniBase 3.8.0 plain | 6629.709 | 229.705 | 58.865 | 738.768 | 1208.188 |
+| iniBase 3.8.0 gzip | 3141.852 | 258.723 | 63.058 | 5174.360 | 1932.057 |
+| iniBase 3.8.0 plain + log | 7305.530 | 257.801 | 64.880 | 178.175 | 1382.575 |
+| iniBase 3.8.0 gzip + log | 3194.676 | 257.580 | 64.079 | 175.072 | 3273.597 |
+| SQLite | 358.504 | 113.873 | 47.684 | 0.731 | 0.302 |
+| DuckDB | 1051.170 | 171.503 | 23.602 | 2.368 | 0.898 |
+| PGlite | 1084.946 | 421.289 | 168.332 | 1.658 | 0.678 |
+| PostgreSQL | 580.652 | 105.262 | 26.082 | 0.995 | 0.486 |
+| MongoDB | 636.233 | 408.611 | 113.722 | 18.148 | 20.182 |
+| LevelDB | 316.729 | 231.328 | 226.973 | 0.793 | 0.452 |
+| LMDB | 522.254 | 167.659 | 113.197 | 19.052 | 19.994 |
+| LMDB LZ4 | 1552.237 | 170.728 | 135.092 | 20.034 | 19.979 |
 
-**Choose the configuration for the workload:** gzip delivers the smallest footprint in this CMS comparison and reads all 100,000 records in 211 ms. Plain iniBase reduces the five-update total from **4,270 ms to 599 ms**, at a larger disk footprint. Competitors remain faster for bulk inserts and these individual updates; the table preserves that tradeoff.
+### Write performance versus 3.7.0
 
-Every trial verifies full content, projections, lookups, updates, and remaining data after deletion. Durability and transaction semantics differ across engines; see the [methodology](METHODOLOGY.md) and [complete timing report, including maintenance](results/large-cms/REPORT.md).
+Same fixtures, API calls, full durability, disabled query caching, and host; collected in separate sessions. Ratios are descriptive observations, not controlled statistical estimates. The log-enabled rows change an explicit table option in addition to the package version.
+
+| Configuration | `post`: insert 100k ms | `put`: 5 updates ms | 5 deletes ms |
+|---|---:|---:|---:|
+| 3.7.0 plain | 6039.691 | 598.635 | 949.284 |
+| 3.8.0 plain | 6629.709 | 738.768 | 1208.188 |
+| 3.8.0 plain + log | 7305.530 | 178.175 | 1382.575 |
+| 3.7.0 gzip | 3223.035 | 4270.342 | 1655.426 |
+| 3.8.0 gzip | 3141.852 | 5174.360 | 1932.057 |
+| 3.8.0 gzip + log | 3194.676 | 175.072 | 3273.597 |
+
+For this five-update workload, the median falls from **4270.3 ms** with historical 3.7.0 gzip to **175.1 ms** with 3.8.0 gzip + log — an observed **24.4× speedup**. The update log changes `put`; append-segment optimization for `post` is not part of this release. Compare delete costs as well as update costs when evaluating the tradeoff.
 
 ### Application-key lookup performance
 
-Median total for 20 application-key lookups at 100,000 records, across three trials:
+Median total for 20 lookups before updates; iniBase filters `seq`, while competitors use native primary-key indexes.
 
-| Configuration | 20 lookups |
+| Configuration | 20 lookups ms |
 |---|---:|
-| iniBase 3.7.0 plain | 1011.9 ms |
-| iniBase 3.7.0 gzip | 1309.4 ms |
-| SQLite | 0.410 ms |
-| LevelDB | 0.515 ms |
-
-iniBase searches the application `seq` field; SQLite and LevelDB use their native primary-key indexes. Indexed competitors remain faster for this workload. See the [historical comparison](HISTORY-3.6.0.md#comparison-with-published-370) for the change from the earlier release.
+| iniBase 3.8.0 plain | 1296.448 |
+| iniBase 3.8.0 gzip | 1661.789 |
+| iniBase 3.8.0 plain + log | 1313.864 |
+| iniBase 3.8.0 gzip + log | 1587.987 |
+| SQLite | 0.441 |
+| DuckDB | 3.905 |
+| PGlite | 4.459 |
+| PostgreSQL | 2.426 |
+| MongoDB | 7.214 |
+| LevelDB | 0.603 |
+| LMDB | 0.395 |
+| LMDB LZ4 | 0.353 |
 
 ![100,000-record CMS storage comparison](results/large-cms/storage.png)
 
-See the [full scale report](results/large-cms/REPORT.md) for every engine, baseline growth, timings, and any failure logs in the linked raw data. This scale run is CMS-only; it does not establish the same advantage for high-entropy data.
+Log-enabled tables currently restrict transactions and schema changes. The suite verifies the updated values and full remaining dataset after deletion, but does not qualify crash recovery or measure populated-overlay read latency, peak log space, or sustained compaction amortization. See the [methodology](METHODOLOGY.md) and [complete report](results/large-cms/REPORT.md).
 
-Across the current main and scale matrices: **210 trials, 210 verified successes, 0 recorded failures**. No failed sample is counted as a storage win. The [large gzip-append regression test](tests/gzip-append.test.mjs) runs against the published package.
+Across both matrices: **252 trials, 252 verified successes, 0 recorded failures**. Failures are retained and excluded from rankings.
 
 ## Engines
 
 | Engine | Configuration |
 |---|---|
-| iniBase 3.7.0 | Plain column files; gzip column files; full durability; cache disabled |
+| iniBase 3.8.0 | Plain/gzip column files, each with default updates or explicit `log: true`; full durability; cache disabled |
 | SQLite | Node's SQLite binding; WAL; synchronous FULL; primary key |
 | DuckDB | Native Node binding; native column compression; primary key; appender bulk import |
 | PGlite | PostgreSQL compiled to WASM; persistent filesystem; relaxed durability disabled |
@@ -103,7 +112,7 @@ Across the current main and scale matrices: **210 trials, 210 verified successes
 | LevelDB | Native classic-level through level; default Snappy compression; sync writes |
 | LMDB | Plain and LZ4-compressed MessagePack values; flushed writes |
 
-Exact package versions are pinned in `package-lock.json`. MongoDB's binary is pinned to 8.2.6. Native PostgreSQL is supplied by the pinned `embedded-postgres` package. Server versions are also recorded in raw results. These are eight engines and ten configurations, not ten unrelated database systems.
+Exact package versions are pinned in `package-lock.json`. MongoDB's binary is pinned to 8.2.6. Native PostgreSQL is supplied by the pinned `embedded-postgres` package. Server versions are also recorded in raw results. These are eight engines and twelve configurations, not twelve unrelated database systems.
 
 ## Run
 
@@ -119,7 +128,7 @@ npm run bench -- --rows=100000 --profiles=cms --repeats=3 --output=results/large
 npm run bench -- --engines=inibase,inibase-gzip,sqlite,duckdb --profiles=cms --rows=10000
 ```
 
-The default run covers 1,000 and 10,000 records, three datasets, ten configurations, and three independent repetitions (180 trials). Engines run sequentially in fresh worker processes and fresh database directories. Engine order rotates across repetitions. Each worker has a five-minute limit. Use a fresh output directory for each experiment.
+The default run covers 1,000 and 10,000 records, three datasets, twelve configurations, and three independent repetitions (216 trials). Engines run sequentially in fresh worker processes and fresh database directories. Engine order rotates across repetitions. Each worker has a five-minute limit. Use a fresh output directory for each experiment.
 
 Installation downloads native dependencies; MongoDB's launcher may download its pinned server binary on first use. The launcher name `mongodb-memory-server` does **not** mean this benchmark uses an in-memory engine: the adapter explicitly selects WiredTiger and a persistent data directory. Both native servers bind only to loopback, use temporary benchmark directories, and are shut down after each storage checkpoint. PostgreSQL uses a random per-worker password. No existing database is contacted.
 
@@ -136,7 +145,7 @@ Native libraries/server startup may require execution outside restrictive sandbo
 
 ## Historical results
 
-Earlier measurements and their original methodology are preserved in the [historical summary](HISTORY-3.6.0.md), [main report](results/v3.6.0/REPORT.md), and [100,000-record report](results/v3.6.0-large-cms/REPORT.md). All current results above use the published iniBase 3.7.0 package.
+Original measurements are preserved in the [3.7.0 summary](HISTORY-3.7.0.md), [3.7.0 scale report](results/v3.7.0-large-cms/REPORT.md), and [3.6.0 summary](HISTORY-3.6.0.md). Current results use published iniBase 3.8.0.
 
 ## Reading the results
 

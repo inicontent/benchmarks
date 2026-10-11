@@ -17,7 +17,7 @@
 		"@duckdb/node-api": "1.5.6-r.1",
 		"@electric-sql/pglite": "0.5.8",
 		"embedded-postgres": "18.4.0-beta.17",
-		"inibase": "3.7.0",
+		"inibase": "3.8.0",
 		"level": "10.0.0",
 		"lmdb": "3.5.7",
 		"mongodb": "7.7.0",

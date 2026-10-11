@@ -3,6 +3,8 @@ import { fields } from "./data.mjs";
 export const engines = [
 	"inibase",
 	"inibase-gzip",
+	"inibase-log",
+	"inibase-gzip-log",
 	"sqlite",
 	"duckdb",
 	"pglite",
@@ -34,10 +36,15 @@ export async function openAdapter(engine, root) {
 					type: ["seq", "score"].includes(key) ? "number" : "string",
 					required: true,
 				})),
-				{ compression: engine.includes("gzip"), cache: false, decodeID: true },
+				{
+					compression: engine.includes("gzip"),
+					cache: false,
+					decodeID: true,
+					...(engine.endsWith("-log") ? { log: true } : {}),
+				},
 			);
 		return {
-			version: "3.7.0",
+			version: "3.8.0",
 			insert: (rows) => db.post("records", structuredClone(rows)),
 			all: async (columns = fields) =>
 				(await db.get("records", undefined, {
