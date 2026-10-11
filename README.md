@@ -59,20 +59,11 @@ Three independent repetitions across twelve configurations, with the same repeti
 | LMDB | 522.254 | 167.659 | 113.197 | 19.052 | 19.994 |
 | LMDB LZ4 | 1552.237 | 170.728 | 135.092 | 20.034 | 19.979 |
 
-### Write performance versus 3.7.0
+### Choosing the update mode
 
-Same fixtures, API calls, full durability, disabled query caching, and host; collected in separate sessions. Ratios are descriptive observations, not controlled statistical estimates. The log-enabled rows change an explicit table option in addition to the package version.
+With published iniBase 3.8.0, enabling `log: true` reduces the five-update total for gzip tables from **5,174 ms to 175 ms** in this workload. Bulk insertion remains around **3.2 seconds**. The following five deletes take **3,274 ms** with logging versus **1,932 ms** without it, including any compaction triggered by the engine.
 
-| Configuration | `post`: insert 100k ms | `put`: 5 updates ms | 5 deletes ms |
-|---|---:|---:|---:|
-| 3.7.0 plain | 6039.691 | 598.635 | 949.284 |
-| 3.8.0 plain | 6629.709 | 738.768 | 1208.188 |
-| 3.8.0 plain + log | 7305.530 | 178.175 | 1382.575 |
-| 3.7.0 gzip | 3223.035 | 4270.342 | 1655.426 |
-| 3.8.0 gzip | 3141.852 | 5174.360 | 1932.057 |
-| 3.8.0 gzip + log | 3194.676 | 175.072 | 3273.597 |
-
-For this five-update workload, the median falls from **4270.3 ms** with historical 3.7.0 gzip to **175.1 ms** with 3.8.0 gzip + log — an observed **24.4× speedup**. The update log changes `put`; append-segment optimization for `post` is not part of this release. Compare delete costs as well as update costs when evaluating the tradeoff.
+Use the full timings above to weigh faster updates against deferred compaction work. Logging is opt-in and currently restricts transactions and schema changes.
 
 ### Application-key lookup performance
 
@@ -142,10 +133,6 @@ Native libraries/server startup may require execution outside restrictive sandbo
 - Per-trial timings, independent-run medians, insert range, package versions, hardware, and process RSS.
 
 `cms` uses explicitly repetitive HTML content, `mixed` uses deterministic high-entropy hexadecimal text of similar size, and `compact` uses short records. These bracket compression behavior; none is a sample of a real customer's production workload.
-
-## Historical results
-
-Original measurements are preserved in the [3.7.0 summary](HISTORY-3.7.0.md), [3.7.0 scale report](results/v3.7.0-large-cms/REPORT.md), and [3.6.0 summary](HISTORY-3.6.0.md). Current results use published iniBase 3.8.0.
 
 ## Reading the results
 
