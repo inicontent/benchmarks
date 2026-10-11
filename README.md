@@ -1,8 +1,24 @@
 # iniContent database benchmarks
 
-Reproducible storage and workload comparisons maintained by the iniBase team. The suite is designed to find and explain iniBase's strengths for CMS workloads, with every measured competitor, failure, and tradeoff retained.
+**100,000 CMS records in 1.64 MiB, with a full read in 211 ms.** Published iniBase 3.7.0 combines a small compressed footprint with efficient bulk reads on this repetitive CMS fixture.
+
+Reproducible comparisons maintained by the iniBase team. All engines store the same application data, and every successful trial verifies its contents. Measurements below come from one Apple M5 host; results depend on the workload and environment.
 
 **[Read the measured report](results/latest/REPORT.md)** · **[100,000-record CMS report](results/large-cms/REPORT.md)** · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
+
+## Where iniBase stands out
+
+At **100,000 repetitive CMS records**, medians of three trials with published **iniBase 3.7.0 gzip**:
+
+| Measured strength | Result |
+|---|---|
+| Small storage footprint | **1.637 MiB** allocated — **89.4% less than LevelDB**, **98.7% less than SQLite** |
+| Read the entire dataset | **211 ms** — 36% less time than MongoDB and 35% less than PGlite in this run |
+| Read only the fields you need | **44 ms** to return `seq` and `category` for all 100,000 records |
+| Bulk loading | **3.22 seconds** for 100,000 records — about **31,027 records/second** in 1,000-record batches |
+| Verified results | **210/210 trials passed** across the complete comparison suite |
+
+These results support iniBase's strengths for compact CMS storage and bulk reads. The full tables below also show faster readers and writers: competitors lead on bulk inserts and indexed record updates/lookups. Read timings are cache-affected; insert timings include commit/flush and exclude separately reported maintenance.
 
 ## Storage highlights from this host
 
@@ -51,7 +67,7 @@ At **100,000 CMS records**, medians of three trials. **All timings are total mil
 | LMDB | 544.114 | 138.888 | 86.385 | 18.286 | 19.139 |
 | LMDB LZ4 | 1391.573 | 139.965 | 111.669 | 19.158 | 20.010 |
 
-iniBase gzip uses less disk on this fixture, but its five updates take **4,270 ms**, compared with **599 ms** for iniBase plain. Its bulk insert also takes longer than every competitor here. Full-read and projection results vary by engine; the storage advantage is not a universal performance advantage.
+**Choose the configuration for the workload:** gzip delivers the smallest footprint in this CMS comparison and reads all 100,000 records in 211 ms. Plain iniBase reduces the five-update total from **4,270 ms to 599 ms**, at a larger disk footprint. Competitors remain faster for bulk inserts and these individual updates; the table preserves that tradeoff.
 
 Every trial verifies full content, projections, lookups, updates, and remaining data after deletion. Durability and transaction semantics differ across engines; see the [methodology](METHODOLOGY.md) and [complete timing report, including maintenance](results/large-cms/REPORT.md).
 
