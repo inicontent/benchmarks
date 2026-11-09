@@ -1,3 +1,5 @@
+import { randomBytes } from "node:crypto";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fields } from "./data.mjs";
 export const engines = [
@@ -26,7 +28,11 @@ const values = (rows) =>
 		.join(",");
 export async function openAdapter(engine, root) {
 	if (engine.startsWith("inibase")) {
+		process.env.INIBASE_SECRET ??= randomBytes(32).toString("hex");
 		const Inibase = (await import("inibase")).default;
+		const { version } = JSON.parse(
+			await readFile(new URL("../package.json", import.meta.resolve("inibase")), "utf8"),
+		);
 		const db = new Inibase("db", root);
 		if (!(await db.getTable("records").catch(() => null)))
 			await db.createTable(
@@ -44,7 +50,7 @@ export async function openAdapter(engine, root) {
 				},
 			);
 		return {
-			version: "3.8.0",
+			version,
 			insert: (rows) => db.post("records", structuredClone(rows)),
 			all: async (columns = fields) =>
 				(await db.get("records", undefined, {
@@ -58,7 +64,7 @@ export async function openAdapter(engine, root) {
 			update: (seq) => db.put("records", { score: -1 }, { seq }),
 			remove: (seq) => db.delete("records", { seq }),
 			maintain: async () => {},
-			close: async () => {},
+			close: () => db.close(),
 		};
 	}
 	if (engine === "sqlite") {

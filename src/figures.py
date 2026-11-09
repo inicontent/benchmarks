@@ -14,9 +14,8 @@ run = json.loads((root / 'results.json').read_text())
 n=max(run['metadata']['sizes'])
 profiles=run['metadata']['profiles']
 def label(k):
-    version=run['metadata']['dependencies']['inibase']
-    return {'inibase':f'iniBase {version} plain', 'inibase-gzip':f'iniBase {version} gzip',
-            'inibase-log':f'iniBase {version} plain + log', 'inibase-gzip-log':f'iniBase {version} gzip + log',
+    return {'inibase':'iniBase (plain)', 'inibase-gzip':'iniBase (gzip)',
+            'inibase-log':'iniBase (plain + legacy log)', 'inibase-gzip-log':'iniBase (gzip + legacy log)',
             'inibase-gzip-patched':'iniBase gzip + patch*'}.get(k,k)
 fig, axes=plt.subplots(1,len(profiles),figsize=(9 if len(profiles)==1 else 6*len(profiles),8),squeeze=False)
 for ax,profile in zip(axes[0],profiles):
@@ -36,8 +35,12 @@ for ax,profile in zip(axes[0],profiles):
     ax.set_xlim(min(vals)*.7,max(vals)*2)
     for side in ['top','right']:ax.spines[side].set_visible(False)
 fig.suptitle(f'Database storage at {n:,} records',fontsize=20,fontweight='bold',y=.99)
-disclosure = "*Historical append patch; separately labeled from the published package." if "inibase-gzip-patched" in run["metadata"]["engines"] else f"Published iniBase {run['metadata']['dependencies']['inibase']}."
-footer = f"Median of {run['metadata']['repeats']} trials, total allocated footprint after maintenance and close. Lower is better.\n{disclosure} Failed correctness runs excluded; all failures retained in report.\nSynthetic data on {run['metadata']['cpu']}. Dedicated server totals include fixed cluster overhead. No cloud-price or speed claim."
+disclosure = "Published iniBase package."
+if "inibase-gzip-patched" in run["metadata"]["engines"]:
+    disclosure = "*Historical append patch; separately labeled from the published package."
+elif "archivedComparators" in run["metadata"]:
+    disclosure = "iniBase was rerun. Other engines use archived measurements from an earlier session."
+footer = f"Median of {run['metadata']['repeats']} trials, total allocated footprint after maintenance and close. Lower is better.\n{disclosure} Failed correctness runs are listed in the report.\nSynthetic data on {run['metadata']['cpu']}. Dedicated server totals include fixed cluster overhead."
 if len(profiles)==1:
     footer='\n'.join(textwrap.fill(line,115) for line in footer.splitlines())
 fig.text(.01,.02,footer,fontsize=10,ha='left')
