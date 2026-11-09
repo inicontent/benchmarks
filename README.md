@@ -1,12 +1,22 @@
 # iniContent database benchmarks
 
-**Published iniBase 3.8.0: 100,000 repetitive CMS records in 1.64 MiB, with five logged updates in 175.1 ms.** Enable `log: true` to use the new incremental update path; default tables retain whole-column updates.
+The iniBase team maintains these database comparisons. Each suite verifies the same application data across its engines. Measurements come from an Apple M5 host and depend on the workload and environment.
 
-Reproducible comparisons maintained by the iniBase team. Every successful trial verifies the same application data. Measurements come from one Apple M5 host; results depend on workload and environment.
+## Current iniBase qualification
 
-**[Read the measured report](results/latest/REPORT.md)** · **[100,000-record CMS report](results/large-cms/REPORT.md)** · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
+The current qualification compares iniBase, SQLite, and PostgreSQL with full durability and explicit key indexes. At 100,000 synthetic CMS records, iniBase with gzip compression used **12.14 MiB** of allocated disk at the end of the workload. Median single-record updates and deletes took **11.79 ms** and **9.96 ms**, including first-use activation of automatic incremental writes. SQLite and PostgreSQL took about **4 ms** per operation.
 
-## Where iniBase stands out
+The qualification verified 81 trials across three datasets and three record counts. Its workload includes maintenance and uses final disk allocation. The historical suite below reports separate totals for five updates and five deletes, and measures disk allocation before updates.
+
+[Current charts](https://github.com/inicontent/inibase/blob/315a74652999fac8af085606cdda62ca989bcb61/README.md#benchmark) · [Qualification report](https://github.com/inicontent/inibase/blob/315a74652999fac8af085606cdda62ca989bcb61/benchmark/results/automatic-deltas-20261101/REPORT.md) · [Raw samples and reproduction](https://github.com/inicontent/inibase/tree/315a74652999fac8af085606cdda62ca989bcb61/benchmark/results/automatic-deltas-20261101)
+
+## Historical eight-engine comparison
+
+This repository's runner pins the published iniBase 3.8.0 package to reproduce the archived results below.
+
+[Full report](results/latest/REPORT.md) · [100,000-record CMS report](results/large-cms/REPORT.md) · [Methodology](METHODOLOGY.md) · [Raw samples](results/latest/results.json)
+
+### Storage and operation highlights
 
 At **100,000 repetitive CMS records**, medians of three trials with **iniBase 3.8.0 gzip + log**:
 
@@ -19,7 +29,7 @@ At **100,000 repetitive CMS records**, medians of three trials with **iniBase 3.
 
 These are short, sequential workloads. The update-log configuration defers column rewrites; the first subsequent delete may perform compaction. The full tables retain that delete cost and all competitors. This is not a sustained-write or equal-feature comparison.
 
-## Storage highlights from this host
+### Storage across datasets
 
 At **10,000 records**, medians of three trials with **iniBase 3.8.0 gzip + log**:
 
@@ -31,11 +41,11 @@ At **10,000 records**, medians of three trials with **iniBase 3.8.0 gzip + log**
 
 Total allocated footprint after bulk loading, maintenance, and close, **before updates**. The report includes every engine and empty-baseline growth. Native server totals include fixed cluster overhead; replicas and backups are excluded.
 
-## 100,000-record CMS scale run
+### 100,000-record CMS scale run
 
 Three independent repetitions across twelve configurations, with the same repetitive CMS fixture and 1,000-row insert batches.
 
-### Read, insert, update, and delete performance
+#### Read, insert, update, and delete performance
 
 **All timings are total milliseconds; lower is better.** Database API operations, not HTTP endpoints:
 
@@ -59,13 +69,13 @@ Three independent repetitions across twelve configurations, with the same repeti
 | LMDB | 522.254 | 167.659 | 113.197 | 19.052 | 19.994 |
 | LMDB LZ4 | 1552.237 | 170.728 | 135.092 | 20.034 | 19.979 |
 
-### Choosing the update mode
+#### Update mode in the historical suite
 
 With published iniBase 3.8.0, enabling `log: true` reduces the five-update total for gzip tables from **5,174 ms to 175 ms** in this workload. Bulk insertion remains around **3.2 seconds**. The following five deletes take **3,274 ms** with logging versus **1,932 ms** without it, including any compaction triggered by the engine.
 
 Use the full timings above to weigh faster updates against deferred compaction work. Logging is opt-in and currently restricts transactions and schema changes.
 
-### Application-key lookup performance
+#### Application-key lookup performance
 
 Median total for 20 lookups before updates; iniBase filters `seq`, while competitors use native primary-key indexes.
 
@@ -90,7 +100,7 @@ Log-enabled tables currently restrict transactions and schema changes. The suite
 
 Across both matrices: **252 trials, 252 verified successes, 0 recorded failures**. Failures are retained and excluded from rankings.
 
-## Engines
+### Engines
 
 | Engine | Configuration |
 |---|---|
@@ -105,7 +115,7 @@ Across both matrices: **252 trials, 252 verified successes, 0 recorded failures*
 
 Exact package versions are pinned in `package-lock.json`. MongoDB's binary is pinned to 8.2.6. Native PostgreSQL is supplied by the pinned `embedded-postgres` package. Server versions are also recorded in raw results. These are eight engines and twelve configurations, not twelve unrelated database systems.
 
-## Run
+### Run
 
 Requires Node >=22.13, npm, and the Unix utilities used by iniBase (`gzip`, `gunzip`, `sed`, `awk`, etc.). Tested on macOS arm64; Linux is supported by the dependencies but was not tested in this run. Windows compatibility is not claimed.
 
@@ -125,7 +135,7 @@ Installation downloads native dependencies; MongoDB's launcher may download its 
 
 Native libraries/server startup may require execution outside restrictive sandboxes. Do not disable durability or silently skip a failing engine to obtain a successful run. Failures are saved and make the runner exit nonzero.
 
-## What the suite measures
+### What the suite measures
 
 - Empty, loaded, maintained/closed, and post-update/delete file footprints: logical bytes and allocated filesystem bytes.
 - Committed bulk insert in batches of 1,000; full reads; two-column projections; 20 key lookups; five separately committed updates and five deletes.
@@ -134,7 +144,7 @@ Native libraries/server startup may require execution outside restrictive sandbo
 
 `cms` uses explicitly repetitive HTML content, `mixed` uses deterministic high-entropy hexadecimal text of similar size, and `compact` uses short records. These bracket compression behavior; none is a sample of a real customer's production workload.
 
-## Reading the results
+### Reading the results
 
 Prefer **allocated bytes** when discussing local disk consumption. Logical file lengths can be misleading for sparse files (especially MongoDB journal files). Compare both total footprint and incremental growth over an empty engine. A dedicated PostgreSQL cluster's fixed cost is not a per-table cost in an existing shared cluster.
 
@@ -142,7 +152,7 @@ Storage wins are not universal speed wins. The suite keeps native/default compre
 
 This is not a hosted-service price comparison. Converting bytes to a bill also needs the host's billing model, minimum volume size, retained WAL/journals, backups, replicas, free tiers, and compute/I/O costs. No cloud-cost saving percentage is inferred automatically.
 
-## Recreate figures
+### Recreate figures
 
 Figures are optional; the benchmark itself only needs Node/npm. With Python 3.9+ installed:
 
