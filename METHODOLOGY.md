@@ -1,6 +1,6 @@
 # Methodology and limitations
 
-This document describes the eight-engine suite in this repository, which pins iniBase 3.8.0. The current three-engine qualification has its own workload, measurements, and reproduction script. See the [iniBase qualification report](https://github.com/inicontent/inibase/blob/315a74652999fac8af085606cdda62ca989bcb61/benchmark/results/automatic-deltas-20261101/REPORT.md).
+This document describes the eight-engine suite in this repository. The current results combine fresh iniBase measurements with the archived competitor samples. Each report records both run environments. The [separate three-engine qualification](https://github.com/inicontent/inibase/blob/315a74652999fac8af085606cdda62ca989bcb61/benchmark/results/automatic-deltas-20261101/REPORT.md) uses a different workload and reports per-operation latency.
 
 ## Disclosure
 
@@ -37,7 +37,7 @@ Every regular file under the engine directory is counted, including schemas, jou
 
 ## Queries and environment
 
-Full reads materialize all five application fields in JavaScript. Projection materializes only `seq` and `category`; row-oriented key-value adapters must decode values to do this. All SQL systems and key-value engines use their native primary key for point lookups. iniBase filters on the application's `seq` field. This intentionally tests the same application query, not identical execution plans. No category/secondary index is added.
+Full reads materialize all five application fields in JavaScript. Projection materializes only `seq` and `category`; row-oriented key-value adapters must decode values to do this. All SQL systems and key-value engines use their native primary key for point lookups. iniBase filters on the application's `seq` field. The benchmark creates no explicit iniBase index, so the engine's automatic indexing policy may apply.
 
 Read timings are affected by the OS cache: closing a database does not evict filesystem pages. `warmReadAllMs` records a second read, but the first read must not be advertised as cold disk. Reads follow bulk ingestion, the workload is sequential and single-client, and background system activity is uncontrolled. There is no concurrency, remote network, connection-pool, multi-tenant, or long-running steady-state test.
 
@@ -65,3 +65,9 @@ The 3.7.0 suite pinned published iniBase 3.7.0 and uses no runtime patch. Histor
 Published iniBase 3.8.0 is pinned without runtime modifications. The original ten configurations retain their settings and workload. Two additional configurations, `inibase-log` and `inibase-gzip-log`, enable the published opt-in `log: true` table setting. Both still use full durability, disable query caching, and filter on the application `seq` field. This produces twelve configurations across eight engines. All competitors are rerun in the same matrix; historical 3.7.0 measurements remain unchanged in `results/v3.7.0` and `results/v3.7.0-large-cms`.
 
 The update test is five individual committed changes, not a sustained-write or compaction-amortization test. The first delete on a log-enabled table may include automatic compaction, and this cost remains in its delete timing. The primary storage measurement is after bulk loading and before updates; post-churn storage is also retained, but peak log growth and peak compaction space are not measured. Full-read, projection, and point-lookup timings precede updates, so they do not measure the populated-overlay read cost. The suite verifies updated values and remaining records but is not a crash-recovery qualification. Log-enabled tables currently restrict transactions and schema changes; none of these benchmark configurations represents equal feature coverage.
+
+## Version transition to 3.9.0
+
+The runner pins the published npm package. Plain and gzip tables use the release defaults, including automatic incremental writes for eligible updates and deletes. The two legacy-log variants explicitly request format-2 compatibility through `log: true`, using the same setting as in the archived run. The adapter closes iniBase between phases to release resources and drain any background work.
+
+Only the four iniBase configurations were rerun. The refresh checks that the workload settings and fixture hashes match before it combines the new samples with the original competitor rows. The output retains both environments, including their separate run IDs, OS and dependency metadata. Compare the timings as observations from separate sessions. Use a fresh all-engine run to compare timings collected in the same session.

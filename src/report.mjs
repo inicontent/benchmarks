@@ -10,11 +10,22 @@ const median = (a) => {
 	return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
 };
 const mib = (v) => (v / 1048576).toFixed(3);
+const engineNames = {
+	inibase: "iniBase (plain)",
+	"inibase-gzip": "iniBase (gzip)",
+	"inibase-log": "iniBase (plain + legacy log)",
+	"inibase-gzip-log": "iniBase (gzip + legacy log)",
+};
+const archive = metadata.archivedComparators;
 const lines = [
 	"# Measured results",
 	"",
-	`Run: ${metadata.runId}. ${metadata.cpu}; ${metadata.platform}/${metadata.arch}; Node ${metadata.node}.`,
+	`${archive ? "iniBase run" : "Run"}: ${metadata.runId}. ${metadata.cpu}; ${metadata.platform}/${metadata.arch}; Node ${metadata.node}.`,
 	"",
+	...(archive ? [
+		`All other engine rows reuse the [archived comparator run](https://github.com/inicontent/benchmarks/tree/${archive.commit}) from ${archive.metadata.runId}. Its environment and dependency versions are recorded in [environment.json](environment.json). The fixture hashes match across sessions. Timings reflect separate sessions and may vary with host software, filesystem cache, and background activity.`,
+		"",
+	] : []),
 	`Each cell is a median of ${metadata.repeats} independent runs when complete. All successful runs passed full-content SHA-256 verification, projected-content verification, and CRUD checks.`,
 	"",
 	"**Scope:** local embedded engines and loopback-only native servers, synthetic fixtures, one table, no replicas or backups. PGlite is PostgreSQL in WASM, not a production PostgreSQL server. LevelDB/LMDB are key-value engines. Timings include adapter/API work and are not feature-equivalent server benchmarks.",
@@ -49,7 +60,7 @@ for (const n of metadata.sizes)
 		for (const g of groups) {
 			const m = (fn) => median(g.rows.map(fn));
 			lines.push(
-				`| ${g.engine} | ${g.rows.length} | ${mib(m((r) => r.stored.logical))} | ${mib(m((r) => r.stored.allocated))} | ${mib(m((r) => r.incremental.logical))} | ${mib(m((r) => r.incremental.allocated))} | ${m((r) => r.timings.insertMs).toFixed(1)} | ${m((r) => r.timings.readAllMs).toFixed(1)} | ${m((r) => r.timings.projectionMs).toFixed(1)} |`,
+				`| ${engineNames[g.engine] ?? g.engine} | ${g.rows.length} | ${mib(m((r) => r.stored.logical))} | ${mib(m((r) => r.stored.allocated))} | ${mib(m((r) => r.incremental.logical))} | ${mib(m((r) => r.incremental.allocated))} | ${m((r) => r.timings.insertMs).toFixed(1)} | ${m((r) => r.timings.readAllMs).toFixed(1)} | ${m((r) => r.timings.projectionMs).toFixed(1)} |`,
 			);
 			csv.push(
 				[
@@ -82,7 +93,7 @@ for (const n of metadata.sizes)
 			const m = (k) => median(g.rows.map((r) => r.timings[k])).toFixed(1);
 			const inserts = g.rows.map((r) => r.timings.insertMs);
 			lines.push(
-				`| ${g.engine} | ${m("point20Ms")} | ${m("update5Ms")} | ${m("delete5Ms")} | ${m("maintenanceMs")} | ${Math.min(...inserts).toFixed(1)}–${Math.max(...inserts).toFixed(1)} |`,
+				`| ${engineNames[g.engine] ?? g.engine} | ${m("point20Ms")} | ${m("update5Ms")} | ${m("delete5Ms")} | ${m("maintenanceMs")} | ${Math.min(...inserts).toFixed(1)}–${Math.max(...inserts).toFixed(1)} |`,
 			);
 		}
 		lines.push("");
@@ -101,7 +112,7 @@ lines.push(
 		: `iniBase version: ${metadata.dependencies.inibase}. Published package, without runtime patches.`,
 	"",
 	...(metadata.engines.includes("inibase-gzip-log") ? [
-		"The `inibase-log` and `inibase-gzip-log` configurations explicitly enable the published opt-in `log: true` setting. Other iniBase configurations retain the default rewrite path. The five updates do not measure sustained compaction amortization; the first subsequent delete may include automatic compaction. The main storage snapshot precedes updates and does not measure peak update-log space. Update-log tables currently restrict transactions and schema changes; these capabilities are not exercised here.",
+		"The `inibase-log` and `inibase-gzip-log` configurations use the format-2 log through `log: true`. Plain and gzip configurations use the published package defaults. The main storage snapshot precedes updates. The five-write phases capture any maintenance triggered during those operations.",
 		"",
 	] : []),
 	"The complete samples, configuration, checksums, input sizes, churn footprints, and RSS measurements are preserved in JSON. Do not infer cloud prices or universal winners from this run.",
