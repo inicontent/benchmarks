@@ -1,5 +1,7 @@
 # Methodology and limitations
 
+This document describes the eight-engine suite in this repository, which pins iniBase 3.8.0. The current three-engine qualification has its own workload, measurements, and reproduction script. See the [iniBase qualification report](https://github.com/inicontent/inibase/blob/315a74652999fac8af085606cdda62ca989bcb61/benchmark/results/automatic-deltas-20261101/REPORT.md).
+
 ## Disclosure
 
 This benchmark is maintained by iniBase's developer organization. It deliberately includes a compressible CMS workload relevant to iniContent, plus equally visible high-entropy and compact-record controls. Results are evidence about these exact workloads and implementations, not a claim that one database is best at everything.
